@@ -1,4 +1,5 @@
 import tkinter as tk
+import time
 
 # in questo vogliamo creare una sequenza di finestre, una di introduzione per la selezione dei parametri, una di 
 # visualizzazione dei risultati.
@@ -149,8 +150,40 @@ big_height = tk.Entry(master=big_frame, bg='white')
 big_height.pack(side=tk.LEFT, fill='x')
 big_height.insert(1, '80')
 
-# todo: BUTTON PART
+# GUI DI PRESENTAZIONE DEL RISULTATO.
 
+def get_results():
+
+    intro_window.withdraw() # permette di nascondere la intro_window temporaneamente (la recuperiamo nel caso si voglia ritornare indietro)
+
+    # top level - finestra secondaria
+    res_window = tk.Toplevel(master=intro_window)
+    res_window.geometry('400x400')
+    res_window.title('Second window') # TODO: ripristinare 'Snail Method'
+    res_window.resizable(height=False, width=False)
+    res_window.configure(background='grey')
+
+    def reset_parameters():
+        '''
+        Restores the parameter settings window and destroy the viz one.
+        '''
+        res_window.destroy()
+        intro_window.deiconify() # restoring intro window
+
+
+    reset_button =tk.Button(master=res_window,
+                            text='back to parameters...',
+                            fg='blue',
+                            command=reset_parameters)
+    
+    reset_button.pack()
+
+# BUTTON PART
+compute_button = tk.Button(text='Elaborate',
+                           fg='green',
+                           command=get_results)
+
+compute_button.pack(pady=10)
 
 
 
