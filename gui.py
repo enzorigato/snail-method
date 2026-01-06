@@ -7,7 +7,7 @@ import time
 intro_window = tk.Tk()
 
 # setting specifiche
-intro_window.geometry('400x400')
+intro_window.geometry('400x310')
 intro_window.title('Snail Method')
 intro_window.resizable(height=False, width=False)
 intro_window.configure(background='grey')
@@ -169,8 +169,6 @@ def get_results():
         '''
         res_window.destroy()
         intro_window.deiconify() # restoring intro window
-
-
     reset_button =tk.Button(master=res_window,
                             text='back to parameters...',
                             fg='blue',
@@ -183,7 +181,7 @@ compute_button = tk.Button(text='Elaborate',
                            fg='green',
                            command=get_results)
 
-compute_button.pack(pady=10)
+compute_button.pack(pady=15)
 
 
 
