@@ -1,5 +1,8 @@
 import tkinter as tk
-import time
+import snail_method as sm
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # in questo vogliamo creare una sequenza di finestre, una di introduzione per la selezione dei parametri, una di 
 # visualizzazione dei risultati.
@@ -55,17 +58,6 @@ small_descr = tk.Label(master=small_frame,
                        bg='lightblue',
                        font=('Helvetica', 11))
 small_descr.pack()
-
-# insert
-'''
-small_x_frame = tk.Frame(small_frame, 
-                        bg='light goldenrod',
-                        width=20,
-                        height=20,
-                        relief=tk.RAISED)
-
-small_x_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH, padx=5)
-'''
 
 # oggetto per ricevere le specifiche
 
@@ -150,40 +142,88 @@ big_height = tk.Entry(master=big_frame, bg='white')
 big_height.pack(side=tk.LEFT, fill='x')
 big_height.insert(1, '80')
 
-# GUI DI PRESENTAZIONE DEL RISULTATO.
+
 
 def get_results():
+
+    # save parameters
+    cnt = sm.Container(length=float(big_height.get()), width=float(big_width.get()))
+    box = sm.Box(x=float(small_width.get()), y=float(small_height.get())) 
 
     intro_window.withdraw() # permette di nascondere la intro_window temporaneamente (la recuperiamo nel caso si voglia ritornare indietro)
 
     # top level - finestra secondaria
     res_window = tk.Toplevel(master=intro_window)
-    res_window.geometry('400x400')
-    res_window.title('Second window') # TODO: ripristinare 'Snail Method'
+    res_window.geometry('800x620')
+    res_window.title('Snail Method')
     res_window.resizable(height=False, width=False)
     res_window.configure(background='grey')
+    
+    # protocol needed in order to have the app converging when window are closed
+    def close_trigger():
+        plt.close('all')
+        intro_window.destroy()
 
+    res_window.protocol('WM_DELETE_WINDOW', close_trigger)
+
+    # backend computations
+    opt = cnt.optimize(box)
+
+    res_frame = tk.Frame(res_window, 
+                         bg='lightblue',
+                         bd=3, 
+                         height=100,
+                         highlightthickness=2,
+                         highlightbackground='black', 
+                         relief=tk.RAISED,
+                         width=100)
+    
+    res_frame.pack(pady=30)
+
+    res_title = tk.Label(master=res_frame,
+                         text=f'{opt.card} boxes have been displaced.',
+                         font=('Helvetica', 15))
+    
+    res_title.pack(fill='both', expand=True)
+
+
+    fig = opt.show(cnt.width, cnt.length)
+
+
+    # creating the Tkinter canvas containing the Matplotlib figure
+    canvas = FigureCanvasTkAgg(fig, master=res_frame)  
+    canvas.draw()
+
+    # placing the toolbar on the Tkinter window
+    canvas.get_tk_widget().pack()
+
+
+    # return to parameter setting button
     def reset_parameters():
         '''
-        Restores the parameter settings window and destroy the viz one.
+        Restores the parameters setting window and destroy the viz one.
         '''
-        res_window.destroy()
         intro_window.deiconify() # restoring intro window
-    reset_button =tk.Button(master=res_window,
-                            text='back to parameters...',
-                            fg='blue',
-                            command=reset_parameters)
+        plt.close('all')
+        res_window.destroy()
+        
+
+    reset_button = tk.Button(master=res_window,
+                             text='back to parameters...',
+                             fg='blue',
+                             command=reset_parameters)
     
     reset_button.pack()
 
-# BUTTON PART
+
+
+# Computation/viz of the results trigger
+
 compute_button = tk.Button(text='Elaborate',
                            fg='green',
                            command=get_results)
 
 compute_button.pack(pady=15)
-
-
 
 if __name__ == '__main__':
     intro_window.mainloop()
